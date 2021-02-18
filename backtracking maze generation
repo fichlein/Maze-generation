@@ -1,0 +1,91 @@
+import random       
+import pygame      
+                    
+
+screensize = 1000
+cellnumber = 100
+cellsize = int(screensize/cellnumber)
+cells = [[[True, True, True, True, False] for x in range(cellnumber)] for y in range(cellnumber)] # cells:[wall1, wall2, w3, w4, bereits_besucht]
+
+
+screen = pygame.display.set_mode((screensize, screensize))
+
+
+def possiblenext(x, y):
+    possible = []
+    if x != 0:
+        possible.append([x-1, y])
+    if x != cellnumber-1:
+        possible.append([x+1, y])
+    if y != 0:
+        possible.append([x, y-1])
+    if y != cellnumber-1:
+        possible.append([x, y+1])
+    if possible != None:
+        random.shuffle(possible)
+        for i in possible:
+            take = True
+            if cells[i[0]][i[1]][4] == True:
+                take = False
+            else:
+                return i
+                break
+
+
+def draw_cell(x, y):
+    if cells[x][y][0] == True:
+        pygame.draw.line(screen, (255, 255, 255), (x*cellsize+cellsize, y*cellsize+cellsize), (x*cellsize+cellsize, y*cellsize))
+        
+    if cells[x][y][1] == True:
+        pygame.draw.line(screen, (255, 255, 255), (x*cellsize+cellsize, y*cellsize), (x*cellsize, y*cellsize))
+
+    if cells[x][y][2] == True:
+        pygame.draw.line(screen, (255, 255, 255), (x*cellsize, y*cellsize), (x*cellsize, y*cellsize+cellsize))
+
+    if cells[x][y][3] == True:
+        pygame.draw.line(screen, (255, 255, 255), (x*cellsize, y*cellsize+cellsize), (x*cellsize+cellsize, y*cellsize+cellsize))
+
+    #pygame.display.update() #schow progress
+
+
+def delete_walls(x1, y1, x2, y2):
+    dx = (x2-x1)
+    dy = (y2-y1)
+    if dx == 1 and dy == 0:
+        cells[x1][y1][0] = False
+        cells[x2][y2][2] = False
+    if dx == -1 and dy == 0:
+        cells[x1][y1][2] = False
+        cells[x2][y2][0] = False
+    if dx == 0 and dy == 1:
+        cells[x1][y1][3] = False
+        cells[x2][y2][1] = False
+    if dx == 0 and dy == -1:
+        cells[x1][y1][1] = False
+        cells[x2][y2][3] = False
+
+currentpos = [0, 0] #start from[0, 0]
+path = []   #buildingpath   
+backsteps = 0
+
+while len(path) < (cellnumber**2): #while not all cells are visited
+    if possiblenext(currentpos[0], currentpos[1]) != None:
+        nextpos = possiblenext(currentpos[0], currentpos[1])
+        cells[nextpos[0]][nextpos[1]][4] = True #mark the cell as visited
+        path.append(nextpos)
+        delete_walls(currentpos[0], currentpos[1], nextpos[0], nextpos[1])
+        currentpos = nextpos
+        #draw_cell(nextpos[0], nextpos[1])   #show progress    
+    else:
+        backsteps += 1
+        currentpos = path[backsteps]
+
+for i in range(cellnumber):
+    for j in range(cellnumber): #draw whole maze
+        draw_cell(i, j)
+
+pygame.display.update()
+pygame.image.save(screen, "screenshot.jpeg")
+
+
+
