@@ -5,7 +5,7 @@ import pygame
 screensize = 1000
 cellnumber = 100
 cellsize = int(screensize/cellnumber)
-cells = [[[True, True, True, True, False] for x in range(cellnumber)] for y in range(cellnumber)] # cells:[wall1, wall2, w3, w4, bereits_besucht]
+cells = [[[True, True, True, True, False] for x in range(cellnumber)] for y in range(cellnumber)] # cells:[wall1, wall2, w3, w4, already_visited]
 
 
 screen = pygame.display.set_mode((screensize, screensize))
